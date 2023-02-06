@@ -2,7 +2,7 @@ import React from 'react';
 
 import Button from '../Button';
 import Radio from '../Radio';
-import ToastShelf from '../ToastShelf';
+import { ToastContext } from '../ToastProvider';
 
 import styles from './ToastPlayground.module.css';
 
@@ -11,22 +11,19 @@ const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 function ToastPlayground() {
     const [selectedVariant, setSelectedVariant] = React.useState(VARIANT_OPTIONS[0]);
     const [message, setMessage] = React.useState('');
-    const [toasts, setToasts] = React.useState([]);
-
+    const {addToast} = React.useContext(ToastContext);
 
     function handleSubmit(e) {
         e.preventDefault();
 
-        const nextToasts = [...toasts];
-        nextToasts.push({ variant: selectedVariant,
+        addToast({
+            variant: selectedVariant,
             message: message,
             id: crypto.randomUUID(),
         });
 
         setMessage('')
         setSelectedVariant(VARIANT_OPTIONS[0])
-
-        setToasts(nextToasts);
     }
 
     return (
@@ -35,8 +32,6 @@ function ToastPlayground() {
                 <img alt="Cute toast mascot" src="/toast.png" />
                 <h1>Toast Playground</h1>
             </header>
-
-            <ToastShelf toasts={toasts} setToasts={setToasts} />
 
             <form className={styles.controlsWrapper} onSubmit={handleSubmit}>
                 <div className={styles.row}>
@@ -70,8 +65,6 @@ function ToastPlayground() {
                             </Radio>
                         )
                         )}
-
-                        {/* TODO Other Variant radio buttons here */}
                     </div>
                 </div>
 
@@ -88,4 +81,4 @@ function ToastPlayground() {
     );
 }
 
-export default ToastPlayground;
+export default React.memo(ToastPlayground);

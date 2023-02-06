@@ -6,6 +6,7 @@ import {
     Info,
     X,
 } from 'react-feather';
+import { ToastContext } from '../ToastProvider';
 
 import VisuallyHidden from '../VisuallyHidden';
 
@@ -18,8 +19,9 @@ const ICONS_BY_VARIANT = {
     error: AlertOctagon,
 };
 
-function Toast({ toast, allToasts, setToasts }) {
-    const { variant, id, message } = toast
+function Toast({ toast }) {
+    const { variant, message } = toast
+    const { deleteToast } = React.useContext(ToastContext);
 
     if (!Object.keys(ICONS_BY_VARIANT).find(key => key === variant)) {
         throw new Error(`Unrecognized toast variant: ${variant}`);
@@ -30,7 +32,7 @@ function Toast({ toast, allToasts, setToasts }) {
     function handleDismiss(e) {
         e.preventDefault();
 
-        setToasts(allToasts.filter(item => item.id !== id))
+        deleteToast(toast)
     }
 
     return (
