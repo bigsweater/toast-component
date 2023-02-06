@@ -2,6 +2,7 @@ import React from 'react';
 
 import Button from '../Button';
 import Radio from '../Radio';
+import Toast from '../Toast';
 
 import styles from './ToastPlayground.module.css';
 
@@ -10,6 +11,7 @@ const VARIANT_OPTIONS = ['notice', 'warning', 'success', 'error'];
 function ToastPlayground() {
     const [selectedVariant, setSelectedVariant] = React.useState(VARIANT_OPTIONS[0]);
     const [message, setMessage] = React.useState('');
+    const [showToast, setShowToast] = React.useState(false);
 
     return (
         <div className={styles.wrapper}>
@@ -18,7 +20,11 @@ function ToastPlayground() {
                 <h1>Toast Playground</h1>
             </header>
 
-            <div className={styles.controlsWrapper}>
+            <Toast variant={selectedVariant} show={showToast} setShowToast={setShowToast}>{message}</Toast>
+
+            <form className={styles.controlsWrapper} onSubmit={(e) => {
+                e.preventDefault(); setShowToast(true)}
+            }>
                 <div className={styles.row}>
                     <label
                         htmlFor="message"
@@ -63,7 +69,7 @@ function ToastPlayground() {
                         <Button>Pop Toast!</Button>
                     </div>
                 </div>
-            </div>
+            </form>
         </div>
     );
 }
