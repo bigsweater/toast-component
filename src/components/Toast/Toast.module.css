@@ -1,3 +1,9 @@
+@keyframes toast {
+  to {
+    transform: translateX(calc(100% + 64px));
+  }
+}
+
 .toast {
   position: relative;
   display: flex;
@@ -63,4 +69,9 @@
 }
 .error .iconContainer {
   color: var(--color-error);
+}
+
+.hide {
+    animation: toast 800ms cubic-bezier(0, 0.46, 0, 1.04) both;
+    will-change: transform;
 }

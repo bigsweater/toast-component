@@ -19,9 +19,11 @@ const ICONS_BY_VARIANT = {
     error: AlertOctagon,
 };
 
-function Toast({ toast }) {
-    const { variant, message } = toast
-    const { deleteToast } = React.useContext(ToastContext);
+function Toast({ toast, duration = 3000}) {
+    const { variant, message, id } = toast;
+    const [show, setShow] = React.useState(true);
+    const clearAllTimerRef = React.useRef(1)
+    const { deleteToast, clearToasts } = React.useContext(ToastContext);
 
     if (!Object.keys(ICONS_BY_VARIANT).find(key => key === variant)) {
         throw new Error(`Unrecognized toast variant: ${variant}`);
@@ -29,18 +31,34 @@ function Toast({ toast }) {
 
     const Icon = ICONS_BY_VARIANT[variant];
 
+    const hideToast = React.useCallback(() => setShow(false), [])
+
+    React.useEffect(() => {
+        clearAllTimerRef.current > 1 && window.clearTimeout(clearAllTimerRef.current)
+        clearAllTimerRef.current = window.setTimeout(clearToasts, duration * 2)
+
+        return () => window.clearTimeout(clearAllTimerRef.current)
+    })
+
+    React.useEffect(() => {
+        const timer = window.setTimeout(hideToast, duration)
+
+        return () => window.clearTimeout(timer)
+    }, [hideToast, duration])
+
     function handleDismiss(e) {
         e.preventDefault();
 
-        deleteToast(toast)
+        deleteToast(id)
     }
 
     return (
-        <div className={`${styles.toast} ${styles[variant]}`}>
+        <div className={`${styles.toast} ${styles[variant]} ${show || styles.hide}`}>
             <div className={styles.iconContainer}>
                 <VisuallyHidden>{variant} &mdash;</VisuallyHidden>{' '}
                 <Icon size={24} />
             </div>
+            <h2>{show ? 'show' : 'hide'}</h2>
             <p className={styles.content}>
                 {message}
             </p>
@@ -53,4 +71,4 @@ function Toast({ toast }) {
     );
 }
 
-export default Toast;
+export default React.memo(Toast);
