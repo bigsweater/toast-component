@@ -6,6 +6,7 @@ import {
     Info,
     X,
 } from 'react-feather';
+import useTimeout from '../../hooks/useTimeout';
 import { ToastContext } from '../ToastProvider';
 
 import VisuallyHidden from '../VisuallyHidden';
@@ -19,50 +20,24 @@ const ICONS_BY_VARIANT = {
     error: AlertOctagon,
 };
 
-function Toast({ toast, duration = 3000}) {
-    const { variant, message, id } = toast;
-    const [show, setShow] = React.useState(true);
-    const clearAllTimerRef = React.useRef(1)
-    const { deleteToast, clearToasts } = React.useContext(ToastContext);
-
-    if (!Object.keys(ICONS_BY_VARIANT).find(key => key === variant)) {
-        throw new Error(`Unrecognized toast variant: ${variant}`);
-    }
-
+function Toast({ id, variant, children }) {
+    const { deleteToast } = React.useContext(ToastContext);
     const Icon = ICONS_BY_VARIANT[variant];
 
-    const hideToast = React.useCallback(() => setShow(false), [])
-
-    React.useEffect(() => {
-        clearAllTimerRef.current > 1 && window.clearTimeout(clearAllTimerRef.current)
-        clearAllTimerRef.current = window.setTimeout(clearToasts, duration * 2)
-
-        return () => window.clearTimeout(clearAllTimerRef.current)
-    })
-
-    React.useEffect(() => {
-        const timer = window.setTimeout(hideToast, duration)
-
-        return () => window.clearTimeout(timer)
-    }, [hideToast, duration])
-
-    function handleDismiss(e) {
-        e.preventDefault();
-
-        deleteToast(id)
-    }
+    const timeoutCallback = React.useCallback(() => deleteToast(id), [id, deleteToast])
+    useTimeout(timeoutCallback, 3000)
 
     return (
-        <div className={`${styles.toast} ${styles[variant]} ${show || styles.hide}`}>
+        <div className={`${styles.toast} ${styles[variant]}`}>
             <div className={styles.iconContainer}>
                 <VisuallyHidden>{variant} &mdash;</VisuallyHidden>{' '}
                 <Icon size={24} />
             </div>
-            <h2>{show ? 'show' : 'hide'}</h2>
             <p className={styles.content}>
-                {message}
+                {children}
             </p>
-            <button className={styles.closeButton} onClick={handleDismiss}
+            <button className={styles.closeButton}
+                onClick={() => deleteToast(id)}
                 aria-label="Dismiss message"
                 aria-live="off">
                 <X size={24} />
@@ -71,4 +46,4 @@ function Toast({ toast, duration = 3000}) {
     );
 }
 
-export default React.memo(Toast);
+export default Toast

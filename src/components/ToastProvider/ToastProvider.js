@@ -7,25 +7,32 @@ function ToastProvider({ children }) {
     const [toasts, setToasts] = React.useState([]);
 
     const deleteToast = React.useCallback((id) => {
-        setToasts(toasts.filter(item => item.id !== id))
-    }, [toasts])
+        setToasts((currentToasts) => {
+            return currentToasts.filter(item => item.id !== id)
+        })
+    }, [])
 
-    const addToast = React.useCallback((toast) => {
-        setToasts([...toasts, toast])
-    }, [toasts])
+    const addToast = React.useCallback((message, variant) => {
+        const id = crypto.randomUUID();
+
+        setToasts(currentToasts => [
+            ...currentToasts,
+            {
+                id,
+                variant,
+                message
+            }
+        ])
+    }, [])
 
     const clearToasts = React.useCallback(() => {
         setToasts([])
-    }, []);
+    }, [])
 
     useKeyDown('Escape', clearToasts)
 
-    const value = React.useMemo(() => ({
-        toasts, addToast, deleteToast, clearToasts
-    }), [toasts, addToast, deleteToast, clearToasts])
-
     return (
-        <ToastContext.Provider value={value}>
+        <ToastContext.Provider value={{ toasts, deleteToast, addToast, clearToasts }}>
             {children}
         </ToastContext.Provider>
     )

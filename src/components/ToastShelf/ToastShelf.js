@@ -13,10 +13,12 @@ function ToastShelf() {
             aria-live="assertive"
             aria-label="Notification"
         >
-            {toasts.map(toast => {
+            {toasts.map(({id, variant, message}) => {
                 return (
-                    <li className={styles.toastWrapper} key={toast.id}>
-                        <Toast toast={toast} />
+                    <li className={styles.toastWrapper} key={id}>
+                        <Toast id={id} variant={variant}>
+                            {message}
+                        </Toast>
                     </li>
                 )
             })}
@@ -24,4 +26,4 @@ function ToastShelf() {
     );
 }
 
-export default React.memo(ToastShelf);
+export default ToastShelf;

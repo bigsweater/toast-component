@@ -16,11 +16,7 @@ function ToastPlayground() {
     function handleSubmit(e) {
         e.preventDefault();
 
-        addToast({
-            variant: selectedVariant,
-            message: message,
-            id: crypto.randomUUID(),
-        });
+        addToast(message, selectedVariant);
 
         setMessage('')
         setSelectedVariant(VARIANT_OPTIONS[0])
@@ -81,4 +77,4 @@ function ToastPlayground() {
     );
 }
 
-export default React.memo(ToastPlayground);
+export default ToastPlayground;
